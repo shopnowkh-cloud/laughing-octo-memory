@@ -429,10 +429,11 @@ async function handleCallback(query, KV, token) {
     return;
   }
   if (data === "menu:tts") {
+    await KV.put(`tool:state:${uid}`, "tts_input", { expirationTtl: 86400 });
     const pref = await getTTSPref(KV, uid);
     await tg("editMessageText", {
       chat_id: pid, message_id: msgId,
-      text: "🎙️ <b>Text to Voice</b>\n\nផ្ញើអត្ថបទមកខ្ញុំ ដើម្បីបម្លែងជាសំឡេង។ អ្នកអាចកំណត់សំឡេង និងល្បឿនខាងក្រោម៖",
+      text: "🎙️ <b>បម្លែងអត្ថបទជាសំឡេង</b>\n\nអ្នកបានជ្រើសរើសមុខងារនេះហើយ។ សូមផ្ញើអត្ថបទដែលចង់បម្លែងជាសំឡេង។\n\nចុច «ត្រឡប់ទៅម៉ឺនុយ» ដើម្បីជ្រើសរើសមុខងារផ្សេង។",
       parse_mode: "HTML",
       reply_markup: { inline_keyboard: [
         ...buildVoiceKeyboard(pref.gender || "female", pref.speed || "x1").inline_keyboard,
@@ -548,6 +549,8 @@ var index_default = {
             } else if (msg.text?.startsWith("/cancel")) {
               await KV.delete(`tool:state:${uid}`);
               await tg("sendMessage", { chat_id: msg.chat.id, text: "បានបោះបង់។ សូមជ្រើសរើសមុខងារពី Menu។", reply_markup: buildMainKeyboard() }, token);
+            } else if (msg.text && await KV.get(`tool:state:${uid}`) === "tts_input") {
+              await handleTTS(msg, KV, token);
             } else if (msg.text && await KV.get(`tool:state:${uid}`) === "qr_input") {
               await KV.delete(`tool:state:${uid}`);
               const value = msg.text.trim();
@@ -566,8 +569,6 @@ var index_default = {
                 const result = await response.json();
                 if (!result.ok) throw new Error(result.description || "Telegram sendPhoto failed");
               }
-            } else if (msg.text) {
-              await handleTTS(msg, KV, token);
             }
           }
         }
