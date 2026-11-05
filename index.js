@@ -371,6 +371,14 @@ async function handleTTS(msg, KV, token) {
   }
 }
 __name(handleTTS, "handleTTS");
+async function showExitKeyboard(chatId, label, token) {
+  await tg("sendMessage", {
+    chat_id: chatId,
+    text: "ប៊ូតុងចេញពីមុខងារបច្ចុប្បន្ន៖",
+    reply_markup: { keyboard: [[{ text: "ចេញពីមុខងារ: " + label }]], resize_keyboard: true, is_persistent: true, one_time_keyboard: false }
+  }, token);
+}
+__name(showExitKeyboard, "showExitKeyboard");
 function buildMainKeyboard() {
   return { inline_keyboard: [
     [{ text: "📄 PDF ទៅជា TXT", callback_data: "menu:pdf_txt" }, { text: "📝 TXT ទៅជា PDF", callback_data: "menu:txt_pdf" }],
@@ -422,6 +430,7 @@ async function handleCallback(query, KV, token) {
   });
   if (data === "menu:home") {
     await KV.delete(`tool:state:${uid}`);
+    await tg("sendMessage", { chat_id: pid, text: "បានចេញពីមុខងារ។", reply_markup: { remove_keyboard: true } }, token).catch(() => {});
     await tg("editMessageText", {
       chat_id: pid, message_id: msgId,
       text: "សូមជ្រើសរើសមុខងារដែលអ្នកចង់ប្រើ៖",
@@ -441,11 +450,13 @@ async function handleCallback(query, KV, token) {
         [{ text: "⬅️ ត្រឡប់ទៅម៉ឺនុយ", callback_data: "menu:home" }]
       ]}
     }, token).catch(() => {});
+    await showExitKeyboard(pid, "TTS", token);
     return;
   }
   if (data === "menu:qr") {
     await KV.put(`tool:state:${uid}`, "qr_input", { expirationTtl: 600 });
     await tg("sendMessage", { chat_id: pid, text: "🔳 សូមផ្ញើអត្ថបទ ឬ URL ដែលអ្នកចង់បង្កើតជា QR Code។\n\nវាយ /cancel ដើម្បីបោះបង់។" }, token);
+    await showExitKeyboard(pid, "QR", token);
     return;
   }
   if (data.startsWith("menu:")) {
@@ -462,6 +473,7 @@ async function handleCallback(query, KV, token) {
       text: label + "\nមុខងារនេះនឹងបន្ថែមនៅដំណាក់កាលទី 2។",
       reply_markup: { inline_keyboard: [[{ text: "⬅️ ត្រឡប់ទៅម៉ឺនុយ", callback_data: "menu:home" }]] }
     }, token).catch(() => {});
+    if (label) await showExitKeyboard(pid, label.replace(/^[^ ]+ /, ""), token);
     return;
   }
   if (data.startsWith("voice:")) {
@@ -547,6 +559,10 @@ var index_default = {
             if (msg.text?.startsWith("/start")) {
               await KV.delete(`tool:state:${uid}`);
               await handleStart(msg, KV, token);
+            } else if (msg.text?.startsWith("ចេញពីមុខងារ:")) {
+              await KV.delete(`tool:state:${uid}`);
+              await tg("sendMessage", { chat_id: msg.chat.id, text: "បានចេញពីមុខងារ។", reply_markup: { remove_keyboard: true } }, token);
+              await tg("sendMessage", { chat_id: msg.chat.id, text: "សូមជ្រើសរើសមុខងារដែលអ្នកចង់ប្រើ៖", reply_markup: buildMainKeyboard() }, token);
             } else if (msg.text?.startsWith("/cancel")) {
               await KV.delete(`tool:state:${uid}`);
               await tg("sendMessage", { chat_id: msg.chat.id, text: "បានបោះបង់។ សូមជ្រើសរើសមុខងារពី Menu។", reply_markup: buildMainKeyboard() }, token);
