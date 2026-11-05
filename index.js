@@ -616,7 +616,7 @@ var index_default = {
               await handleStart(msg, KV, token);
             } else if (msg.text?.startsWith("ចេញពីមុខងារ:")) {
               await KV.delete(`tool:state:${uid}`);
-              await tg("sendMessage", { chat_id: msg.chat.id, text: "សូមជ្រើសរើសមុខងារដែលអ្នកចង់ប្រើ៖", reply_markup: { remove_keyboard: true } }, token);
+              await tg("sendMessage", { chat_id: msg.chat.id, text: "\u200B", reply_markup: { remove_keyboard: true } }, token);
               await tg("sendMessage", { chat_id: msg.chat.id, text: "សូមជ្រើសរើសមុខងារដែលអ្នកចង់ប្រើ៖", reply_markup: buildMainKeyboard() }, token);
             } else if (msg.text && await KV.get(`tool:state:${uid}`) === "tts_input") {
               await handleTTS(msg, KV, token);
