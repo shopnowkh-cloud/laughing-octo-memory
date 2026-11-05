@@ -379,6 +379,51 @@ async function showExitKeyboard(chatId, label, token) {
   }, token);
 }
 __name(showExitKeyboard, "showExitKeyboard");
+async function handleQRScan(msg, KV, token) {
+  const uid = msg.from?.id || msg.chat.id;
+  let fileId = msg.photo?.[msg.photo.length - 1]?.file_id;
+  let fileName = "qr-image.jpg";
+  if (!fileId && msg.document) {
+    const mime = msg.document.mime_type || "";
+    if (!mime.startsWith("image/")) {
+      await tg("sendMessage", { chat_id: msg.chat.id, text: "សូមផ្ញើរូបភាព QR ជា JPG, PNG ឬ WEBP។" }, token);
+      return;
+    }
+    fileId = msg.document.file_id;
+    fileName = msg.document.file_name || fileName;
+  }
+  if (!fileId) {
+    await tg("sendMessage", { chat_id: msg.chat.id, text: "📷 សូមផ្ញើរូបភាពដែលមាន QR Code ដើម្បីស្កេន។" }, token);
+    return;
+  }
+  await tg("sendMessage", { chat_id: msg.chat.id, text: "🔍 កំពុងស្កេន QR Code..." }, token);
+  try {
+    const fileInfo = await tg("getFile", { file_id: fileId }, token);
+    const imageResponse = await fetch(`${TG}/file/bot${token}/${fileInfo.file_path}`);
+    if (!imageResponse.ok) throw new Error("Unable to download image from Telegram");
+    const imageBlob = await imageResponse.blob();
+    const form = new FormData();
+    form.append("file", imageBlob, fileName);
+    const scanResponse = await fetch("https://api.qrserver.com/v1/read-qr-code/", { method: "POST", body: form });
+    if (!scanResponse.ok) throw new Error("QR scan service unavailable");
+    const scanData = await scanResponse.json();
+    const results = (scanData || []).flatMap(item => item.symbol || []).map(item => item.data).filter(Boolean);
+    await KV.delete(`tool:state:${uid}`);
+    if (!results.length) {
+      await tg("sendMessage", { chat_id: msg.chat.id, text: "❌ រកមិនឃើញ QR Code ទេ។ សូមផ្ញើរូបភាពច្បាស់ជាងនេះ ហើយសាកល្បងម្ដងទៀត។" }, token);
+      return;
+    }
+    for (let i = 0; i < results.length; i++) {
+      const value = results[i];
+      const safeValue = value.length > 3500 ? value.slice(0, 3500) + "…" : value;
+      await tg("sendMessage", { chat_id: msg.chat.id, text: `✅ រកឃើញ QR Code ${results.length > 1 ? `(${i + 1}/${results.length})` : ""}:\n\n<code>${safeValue.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`, parse_mode: "HTML", disable_web_page_preview: true }, token);
+    }
+  } catch (err) {
+    console.error("QR scan error:", err.message);
+    await tg("sendMessage", { chat_id: msg.chat.id, text: "⚠️ មិនអាចស្កេនបានទេ។ សូមសាកល្បងម្ដងទៀត។" }, token).catch(() => {});
+  }
+}
+__name(handleQRScan, "handleQRScan");
 function buildMainKeyboard() {
   return { inline_keyboard: [
     [{ text: "📝 TXT ទៅជា PDF", callback_data: "menu:txt_pdf" }],
@@ -458,6 +503,12 @@ async function handleCallback(query, KV, token) {
     await showExitKeyboard(pid, "TTS", token);
     return;
   }
+  if (data === "menu:scan_qr") {
+    await KV.put(`tool:state:${uid}`, "scan_qr_input", { expirationTtl: 600 });
+    await tg("sendMessage", { chat_id: pid, text: "📷 សូមផ្ញើរូបភាពដែលមាន QR Code (JPG, PNG ឬ WEBP) ដើម្បីស្កេន។\\n\\nវាយ /cancel ដើម្បីបោះបង់។" }, token);
+    await showExitKeyboard(pid, "ស្កេន QR", token);
+    return;
+  }
   if (data === "menu:qr") {
     await KV.put(`tool:state:${uid}`, "qr_input", { expirationTtl: 600 });
     await tg("sendMessage", { chat_id: pid, text: "🔳 សូមផ្ញើអត្ថបទ ឬ URL ដែលអ្នកចង់បង្កើតជា QR Code។\n\nវាយ /cancel ដើម្បីបោះបង់។" }, token);
@@ -469,7 +520,7 @@ async function handleCallback(query, KV, token) {
     const labels = {
       "menu:txt_pdf":"📝 TXT ទៅជា PDF",
       "menu:image_pdf":"🖼️ រូបភាព ទៅជា PDF", "menu:merge_pdf":"📚 បញ្ចូល PDF ចូលគ្នា",
-      "menu:scan_qr":"📷 ស្កេន QR កូដ", "menu:text_link":"🔗 អត្ថបទទៅជាតំណ",
+      "menu:text_link":"🔗 អត្ថបទទៅជាតំណ",
       "menu:video_link":"🎬 វីដេអូទៅជាតំណ",
     };
     const label = labels[data];
@@ -573,6 +624,8 @@ var index_default = {
               await tg("sendMessage", { chat_id: msg.chat.id, text: "បានបោះបង់។ សូមជ្រើសរើសមុខងារពី Menu។", reply_markup: buildMainKeyboard() }, token);
             } else if (msg.text && await KV.get(`tool:state:${uid}`) === "tts_input") {
               await handleTTS(msg, KV, token);
+            } else if ((msg.photo || msg.document) && await KV.get(`tool:state:${uid}`) === "scan_qr_input") {
+              await handleQRScan(msg, KV, token);
             } else if (msg.text && await KV.get(`tool:state:${uid}`) === "qr_input") {
               await KV.delete(`tool:state:${uid}`);
               const value = msg.text.trim();
