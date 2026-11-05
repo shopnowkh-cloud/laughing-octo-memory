@@ -373,12 +373,12 @@ async function handleTTS(msg, KV, token) {
 __name(handleTTS, "handleTTS");
 function buildMainKeyboard() {
   return { inline_keyboard: [
-    [{ text: "📄 PDF to TXT", callback_data: "menu:pdf_txt" }, { text: "📝 TXT to PDF", callback_data: "menu:txt_pdf" }],
-    [{ text: "🖼️ Image to PDF", callback_data: "menu:image_pdf" }, { text: "📚 Merge PDF", callback_data: "menu:merge_pdf" }],
-    [{ text: "🔳 Create QR Code", callback_data: "menu:qr" }, { text: "📷 Scan QR Code", callback_data: "menu:scan_qr" }],
-    [{ text: "🎙️ Text to Voice", callback_data: "menu:tts" }],
-    [{ text: "🔗 Text to Link", callback_data: "menu:text_link" }, { text: "🎬 Video to Link", callback_data: "menu:video_link" }],
-    [{ text: "🖼️ Image to Link", callback_data: "menu:image_link" }, { text: "ℹ️ About", callback_data: "menu:about" }]
+    [{ text: "📄 PDF ទៅជា TXT", callback_data: "menu:pdf_txt" }, { text: "📝 TXT ទៅជា PDF", callback_data: "menu:txt_pdf" }],
+    [{ text: "🖼️ រូបភាព ទៅជា PDF", callback_data: "menu:image_pdf" }, { text: "📚 បញ្ចូល PDF ចូលគ្នា", callback_data: "menu:merge_pdf" }],
+    [{ text: "🔳 បង្កើត QR កូដ", callback_data: "menu:qr" }, { text: "📷 ស្កេន QR កូដ", callback_data: "menu:scan_qr" }],
+    [{ text: "🎙️ បម្លែងអត្ថបទជាសំឡេង", callback_data: "menu:tts" }],
+    [{ text: "🔗 អត្ថបទទៅជាតំណ", callback_data: "menu:text_link" }, { text: "🎬 វីដេអូទៅជាតំណ", callback_data: "menu:video_link" }],
+    [{ text: "🖼️ រូបភាពទៅជាតំណ", callback_data: "menu:image_link" }, { text: "ℹ️ អំពីកម្មវិធី", callback_data: "menu:about" }]
   ] };
 }
 __name(buildMainKeyboard, "buildMainKeyboard");
@@ -436,7 +436,7 @@ async function handleCallback(query, KV, token) {
       parse_mode: "HTML",
       reply_markup: { inline_keyboard: [
         ...buildVoiceKeyboard(pref.gender || "female", pref.speed || "x1").inline_keyboard,
-        [{ text: "⬅️ ត្រឡប់ទៅ Menu", callback_data: "menu:home" }]
+        [{ text: "⬅️ ត្រឡប់ទៅម៉ឺនុយ", callback_data: "menu:home" }]
       ]}
     }, token).catch(() => {});
     return;
@@ -448,17 +448,17 @@ async function handleCallback(query, KV, token) {
   }
   if (data.startsWith("menu:")) {
     const labels = {
-      "menu:pdf_txt":"📄 PDF to TXT", "menu:txt_pdf":"📝 TXT to PDF",
-      "menu:image_pdf":"🖼️ Image to PDF", "menu:merge_pdf":"📚 Merge PDF",
-      "menu:scan_qr":"📷 Scan QR Code", "menu:text_link":"🔗 Text to Link",
-      "menu:video_link":"🎬 Video to Link", "menu:image_link":"🖼️ Image to Link",
-      "menu:about":"ℹ️ About"
+      "menu:pdf_txt":"📄 PDF ទៅជា TXT", "menu:txt_pdf":"📝 TXT ទៅជា PDF",
+      "menu:image_pdf":"🖼️ រូបភាព ទៅជា PDF", "menu:merge_pdf":"📚 បញ្ចូល PDF ចូលគ្នា",
+      "menu:scan_qr":"📷 ស្កេន QR កូដ", "menu:text_link":"🔗 អត្ថបទទៅជាតំណ",
+      "menu:video_link":"🎬 វីដេអូទៅជាតំណ", "menu:image_link":"🖼️ រូបភាពទៅជាតំណ",
+      "menu:about":"ℹ️ អំពីកម្មវិធី"
     };
     const label = labels[data];
     if (label) await tg("sendMessage", {
       chat_id: pid,
       text: data === "menu:about" ? "ℹ️ RADY AI Multifunction Bot\nមុខងារបន្ថែមកំពុងអភិវឌ្ឍ។" : label + "\nមុខងារនេះនឹងបន្ថែមនៅដំណាក់កាលទី 2។",
-      reply_markup: { inline_keyboard: [[{ text: "⬅️ ត្រឡប់ទៅ Menu", callback_data: "menu:home" }]] }
+      reply_markup: { inline_keyboard: [[{ text: "⬅️ ត្រឡប់ទៅម៉ឺនុយ", callback_data: "menu:home" }]] }
     }, token).catch(() => {});
     return;
   }
