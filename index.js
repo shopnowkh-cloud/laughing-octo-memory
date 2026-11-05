@@ -317,13 +317,13 @@ async function sendVoice(chatId, audioOrFileId, token, extra = {}) {
 __name(sendVoice, "sendVoice");
 function buildVoiceKeyboard(gender, speed) {
   const gRow = [
-    { text: `${gender === "female" ? "\u2705 " : ""}\u{1F469} \u179F\u17C6\u17A1\u17C1\u1784\u179F\u17D2\u179A\u17B8`, callback_data: "voice:female", style: gender === "female" ? "success" : "primary" },
-    { text: `${gender === "male" ? "\u2705 " : ""}\u{1F468} \u179F\u17C6\u17A1\u17C1\u1784\u1794\u17D2\u179A\u17BB\u179F`, callback_data: "voice:male", style: gender === "male" ? "success" : "primary" }
+    { text: `${gender === "female" ? "\u2705 " : ""}\u{1F469} \u179F\u17C6\u17A1\u17C1\u1784\u179F\u17D2\u179A\u17B8`, callback_data: "voice:female", style: "primary" },
+    { text: `${gender === "male" ? "\u2705 " : ""}\u{1F468} \u179F\u17C6\u17A1\u17C1\u1784\u1794\u17D2\u179A\u17BB\u179F`, callback_data: "voice:male", style: "primary" }
   ];
   const sRow = Object.keys(SPEED_RATES).map((s) => ({
     text: (s === speed ? "\u2705 " : "") + SPEED_LABELS[s],
     callback_data: `set_speed:${s}`,
-    style: s === speed ? "success" : "primary"
+    style: "primary"
   }));
   return { inline_keyboard: [gRow, sRow] };
 }
@@ -503,7 +503,7 @@ var index_default = {
     return new Response("Not Found", { status: 404 });
   }
 };
-// RADY TTS BUTTON STYLE: selected=success, unselected=primary
+// RADY TTS BUTTON STYLE: Telegram Bot API 9.4 - all buttons primary blue
 
 export {
   index_default as default
