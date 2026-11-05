@@ -374,7 +374,7 @@ __name(handleTTS, "handleTTS");
 async function showExitKeyboard(chatId, label, token) {
   await tg("sendMessage", {
     chat_id: chatId,
-    text: "ប៊ូតុងចេញពីមុខងារបច្ចុប្បន្ន៖",
+    text: "\u200B",
     reply_markup: { keyboard: [[{ text: "ចេញពីមុខងារ: " + label, style: "danger" }]], resize_keyboard: true, is_persistent: true, one_time_keyboard: false }
   }, token);
 }
