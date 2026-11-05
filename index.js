@@ -429,7 +429,7 @@ function buildMainKeyboard() {
     [{ text: "📝 TXT ទៅជា PDF", callback_data: "menu:txt_pdf" }],
     [{ text: "🖼️ រូបភាព ទៅជា PDF", callback_data: "menu:image_pdf" }, { text: "📚 បញ្ចូល PDF ចូលគ្នា", callback_data: "menu:merge_pdf" }],
     [{ text: "🔳 បង្កើត QR កូដ", callback_data: "menu:qr" }, { text: "📷 ស្កេន QR កូដ", callback_data: "menu:scan_qr" }],
-    [{ text: "🔗 អត្ថបទទៅជាតំណ", callback_data: "menu:text_link" }, { text: "🎬 វីដេអូទៅជាតំណ", callback_data: "menu:video_link" }],
+    [{ text: "🎬 វីដេអូទៅជាតំណ", callback_data: "menu:video_link" }],
   ] };
 }
 __name(buildMainKeyboard, "buildMainKeyboard");
@@ -505,13 +505,13 @@ async function handleCallback(query, KV, token) {
   }
   if (data === "menu:scan_qr") {
     await KV.put(`tool:state:${uid}`, "scan_qr_input", { expirationTtl: 600 });
-    await tg("sendMessage", { chat_id: pid, text: "📷 សូមផ្ញើរូបភាពដែលមាន QR Code (JPG, PNG ឬ WEBP) ដើម្បីស្កេន។\\n\\nវាយ /cancel ដើម្បីបោះបង់។" }, token);
+    await tg("sendMessage", { chat_id: pid, text: "📷 សូមផ្ញើរូបភាពដែលមាន QR Code (JPG, PNG ឬ WEBP) ដើម្បីស្កេន។" }, token);
     await showExitKeyboard(pid, "ស្កេន QR", token);
     return;
   }
   if (data === "menu:qr") {
     await KV.put(`tool:state:${uid}`, "qr_input", { expirationTtl: 600 });
-    await tg("sendMessage", { chat_id: pid, text: "🔳 សូមផ្ញើអត្ថបទ ឬ URL ដែលអ្នកចង់បង្កើតជា QR Code។\n\nវាយ /cancel ដើម្បីបោះបង់។" }, token);
+    await tg("sendMessage", { chat_id: pid, text: "🔳 សូមផ្ញើអត្ថបទ ឬ URL ដែលអ្នកចង់បង្កើតជា QR Code។" }, token);
     await showExitKeyboard(pid, "QR", token);
     return;
   }
@@ -520,7 +520,6 @@ async function handleCallback(query, KV, token) {
     const labels = {
       "menu:txt_pdf":"📝 TXT ទៅជា PDF",
       "menu:image_pdf":"🖼️ រូបភាព ទៅជា PDF", "menu:merge_pdf":"📚 បញ្ចូល PDF ចូលគ្នា",
-      "menu:text_link":"🔗 អត្ថបទទៅជាតំណ",
       "menu:video_link":"🎬 វីដេអូទៅជាតំណ",
     };
     const label = labels[data];
@@ -619,9 +618,6 @@ var index_default = {
               await KV.delete(`tool:state:${uid}`);
               await tg("sendMessage", { chat_id: msg.chat.id, text: "សូមជ្រើសរើសមុខងារដែលអ្នកចង់ប្រើ៖", reply_markup: { remove_keyboard: true } }, token);
               await tg("sendMessage", { chat_id: msg.chat.id, text: "សូមជ្រើសរើសមុខងារដែលអ្នកចង់ប្រើ៖", reply_markup: buildMainKeyboard() }, token);
-            } else if (msg.text?.startsWith("/cancel")) {
-              await KV.delete(`tool:state:${uid}`);
-              await tg("sendMessage", { chat_id: msg.chat.id, text: "បានបោះបង់។ សូមជ្រើសរើសមុខងារពី Menu។", reply_markup: buildMainKeyboard() }, token);
             } else if (msg.text && await KV.get(`tool:state:${uid}`) === "tts_input") {
               await handleTTS(msg, KV, token);
             } else if ((msg.photo || msg.document) && await KV.get(`tool:state:${uid}`) === "scan_qr_input") {
