@@ -428,6 +428,13 @@ async function handleCallback(query, KV, token) {
   const data = query.data;
   await tg("answerCallbackQuery", { callback_query_id: query.id }, token).catch(() => {
   });
+  if (data.startsWith("menu:") && data !== "menu:home") {
+    await tg("editMessageReplyMarkup", {
+      chat_id: pid,
+      message_id: msgId,
+      reply_markup: { inline_keyboard: [] }
+    }, token).catch(() => {});
+  }
   if (data === "menu:home") {
     await KV.delete(`tool:state:${uid}`);
     await tg("sendMessage", { chat_id: pid, text: "បានចេញពីមុខងារ។", reply_markup: { remove_keyboard: true } }, token).catch(() => {});
