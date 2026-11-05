@@ -408,7 +408,7 @@ async function handleStart(msg, KV, token) {
   await tg("sendMessage", {
     chat_id: msg.chat.id,
     parse_mode: "HTML",
-    text: "👋 <b>សូមស្វាគមន៍មកកាន់ RADY AI Multifunction Bot</b>\n\nសូមជ្រើសរើសមុខងារដែលអ្នកចង់ប្រើ៖",
+    text: "សូមជ្រើសរើសមុខងារដែលអ្នកចង់ប្រើ៖",
     reply_markup: buildMainKeyboard()
   }, token);
 }
@@ -424,7 +424,7 @@ async function handleCallback(query, KV, token) {
     await KV.delete(`tool:state:${uid}`);
     await tg("editMessageText", {
       chat_id: pid, message_id: msgId,
-      text: "👋 <b>RADY AI Multifunction Bot</b>\n\nសូមជ្រើសរើសមុខងារ៖",
+      text: "សូមជ្រើសរើសមុខងារដែលអ្នកចង់ប្រើ៖",
       parse_mode: "HTML", reply_markup: buildMainKeyboard()
     }, token).catch(() => {});
     return;
