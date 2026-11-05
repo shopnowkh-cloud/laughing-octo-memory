@@ -533,7 +533,7 @@ var index_default = {
     }
     if (method === "POST" && url.pathname === "/webhook") {
       const update = await request.json();
-      const token = env.BOT_TOKEN;
+      const token = env.BOT_TOKEN || env.TELEGRAM_BOT_TOKEN;
       const KV = env.KV;
       try {
         if (update.callback_query) {
