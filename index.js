@@ -500,7 +500,7 @@ async function handleCallback(query, KV, token) {
   }
   if (data === "menu:txt_file") {
     await KV.put(`tool:state:${uid}`, "txt_input", { expirationTtl: 3600 });
-    await tg("sendMessage", { chat_id: pid, text: "📝 សូមវាយអត្ថបទដែលអ្នកចង់បង្កើតជា TXT File។" }, token);
+    await tg("editMessageText", { chat_id: pid, message_id: msgId, text: "📝 សូមវាយអត្ថបទដែលអ្នកចង់បង្កើតជា TXT File។" }, token);
     await showExitKeyboard(pid, "TXT", token);
     return;
   }
