@@ -375,7 +375,7 @@ async function showExitKeyboard(chatId, label, token) {
   await tg("sendMessage", {
     chat_id: chatId,
     text: "ប៊ូតុងចេញពីមុខងារបច្ចុប្បន្ន៖",
-    reply_markup: { keyboard: [[{ text: "ចេញពីមុខងារ: " + label }]], resize_keyboard: true, is_persistent: true, one_time_keyboard: false }
+    reply_markup: { keyboard: [[{ text: "ចេញពីមុខងារ: " + label, style: "danger" }]], resize_keyboard: true, is_persistent: true, one_time_keyboard: false }
   }, token);
 }
 __name(showExitKeyboard, "showExitKeyboard");
