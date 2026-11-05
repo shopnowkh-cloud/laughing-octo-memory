@@ -421,6 +421,7 @@ async function handleCallback(query, KV, token) {
   await tg("answerCallbackQuery", { callback_query_id: query.id }, token).catch(() => {
   });
   if (data === "menu:home") {
+    await KV.delete(`tool:state:${uid}`);
     await tg("editMessageText", {
       chat_id: pid, message_id: msgId,
       text: "👋 <b>RADY AI Multifunction Bot</b>\n\nសូមជ្រើសរើសមុខងារ៖",
@@ -448,6 +449,7 @@ async function handleCallback(query, KV, token) {
     return;
   }
   if (data.startsWith("menu:")) {
+    await KV.delete(`tool:state:${uid}`);
     const labels = {
       "menu:pdf_txt":"📄 PDF ទៅជា TXT", "menu:txt_pdf":"📝 TXT ទៅជា PDF",
       "menu:image_pdf":"🖼️ រូបភាព ទៅជា PDF", "menu:merge_pdf":"📚 បញ្ចូល PDF ចូលគ្នា",
