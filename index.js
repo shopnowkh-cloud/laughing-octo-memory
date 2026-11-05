@@ -437,7 +437,7 @@ async function handleCallback(query, KV, token) {
   }
   if (data === "menu:home") {
     await KV.delete(`tool:state:${uid}`);
-    await tg("sendMessage", { chat_id: pid, text: "", reply_markup: { remove_keyboard: true } }, token).catch(() => {});
+    await tg("sendMessage", { chat_id: pid, text: "\u200B", reply_markup: { remove_keyboard: true } }, token).catch(() => {});
     await tg("editMessageText", {
       chat_id: pid, message_id: msgId,
       text: "សូមជ្រើសរើសមុខងារដែលអ្នកចង់ប្រើ៖",
