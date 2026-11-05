@@ -492,12 +492,8 @@ async function handleCallback(query, KV, token) {
     const pref = await getTTSPref(KV, uid);
     await tg("editMessageText", {
       chat_id: pid, message_id: msgId,
-      text: "🎙️ <b>បម្លែងអត្ថបទជាសំឡេង</b>\n\nអ្នកបានជ្រើសរើសមុខងារនេះហើយ។ សូមផ្ញើអត្ថបទដែលចង់បម្លែងជាសំឡេង។\n\nចុច «ត្រឡប់ទៅម៉ឺនុយ» ដើម្បីជ្រើសរើសមុខងារផ្សេង។",
-      parse_mode: "HTML",
-      reply_markup: { inline_keyboard: [
-        ...buildVoiceKeyboard(pref.gender || "female", pref.speed || "x1").inline_keyboard,
-        [{ text: "⬅️ ត្រឡប់ទៅម៉ឺនុយ", callback_data: "menu:home" }]
-      ]}
+      text: "🎙️ <b>បម្លែងអត្ថបទជាសំឡេង</b>\n\nអ្នកបានជ្រើសរើសមុខងារនេះហើយ។ សូមផ្ញើអត្ថបទដែលចង់បម្លែងជាសំឡេង។",
+      parse_mode: "HTML"
     }, token).catch(() => {});
     await showExitKeyboard(pid, "TTS", token);
     return;
@@ -523,8 +519,7 @@ async function handleCallback(query, KV, token) {
     const label = labels[data];
     if (label) await tg("sendMessage", {
       chat_id: pid,
-      text: label + "\nមុខងារនេះនឹងបន្ថែមនៅដំណាក់កាលទី 2។",
-      reply_markup: { inline_keyboard: [[{ text: "⬅️ ត្រឡប់ទៅម៉ឺនុយ", callback_data: "menu:home" }]] }
+      text: label + "\nសូមផ្ញើឯកសារ ឬទិន្នន័យដែលអ្នកចង់ប្រើ។"
     }, token).catch(() => {});
     if (label) await showExitKeyboard(pid, label.replace(/^[^ ]+ /, ""), token);
     return;
