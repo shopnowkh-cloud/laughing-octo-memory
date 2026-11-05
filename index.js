@@ -513,8 +513,8 @@ var index_default = {
         const result = await tg("setWebhook", {
           url: workerUrl,
           allowed_updates: ["message", "callback_query", "inline_query"]
-        }, env.BOT_TOKEN);
-        const info = await tg("getWebhookInfo", {}, env.BOT_TOKEN);
+        }, (env.BOT_TOKEN || env.TELEGRAM_BOT_TOKEN));
+        const info = await tg("getWebhookInfo", {}, (env.BOT_TOKEN || env.TELEGRAM_BOT_TOKEN));
         return new Response(JSON.stringify({ ok: true, webhook: workerUrl, info }, null, 2), {
           headers: { "Content-Type": "application/json" }
         });
@@ -526,14 +526,14 @@ var index_default = {
       }
     }
     if (method === "GET" && url.pathname === "/") {
-      const info = await tg("getWebhookInfo", {}, env.BOT_TOKEN).catch((e) => ({ error: e.message }));
+      const info = await tg("getWebhookInfo", {}, (env.BOT_TOKEN || env.TELEGRAM_BOT_TOKEN)).catch((e) => ({ error: e.message }));
       return new Response(JSON.stringify({ ok: true, bot: "@limsovannradybot", webhook: info }, null, 2), {
         headers: { "Content-Type": "application/json" }
       });
     }
     if (method === "POST" && url.pathname === "/webhook") {
       const update = await request.json();
-      const token = env.BOT_TOKEN || env.TELEGRAM_BOT_TOKEN;
+      const token = (env.BOT_TOKEN || env.TELEGRAM_BOT_TOKEN) || env.TELEGRAM_BOT_TOKEN;
       const KV = env.KV;
       try {
         if (update.callback_query) {
