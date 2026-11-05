@@ -384,30 +384,7 @@ async function handleStart(msg, KV, token) {
         await tg("sendMessage", {
           chat_id: ADMIN_ID,
           parse_mode: "HTML",
-          text: `\u{1F195} <b>\u17A2\u17D2\u1793\u1780\u1794\u17D2\u179A\u17BE\u1794\u17D2\u179A\u17B6\u179F\u17CB\u1790\u17D2\u1798\u17B8!</b>
-
-\u{1F464} <b>\u1788\u17D2\u1798\u17C4\u17C7:</b> ${name}
-\u{1F516} <b>Username:</b> ${uname}
-\u{1FAAA} <b>ID:</b> <code>${uid}</code>`
-        }, token);
-      } catch {
-      }
-    }
-  }
-  const pref = await getTTSPref(KV, uid || msg.chat.id);
-  const gender = pref.gender || "female";
-  const speed = pref.speed || "x1";
-  const lastName = msg.from?.last_name || msg.from?.first_name || "\u1794\u1784\u1794\u17D2\u17A2\u17BC\u1793";
-  await tg("sendMessage", {
-    chat_id: msg.chat.id,
-    parse_mode: "HTML",
-    text: `\u{1F44B} <b>\u179F\u17BD\u179F\u17D2\u178F\u17B8</b> ${lastName}
-
-<b>\u1781\u17D2\u1789\u17BB\u17C6\u1787\u17B6 Text to Voice Bot</b>
-
-\u{1F449} <i>\u1782\u17D2\u179A\u17B6\u1793\u17CB\u178F\u17C2\u179F\u179A\u179F\u17C1\u179A\u17A2\u1780\u17D2\u179F\u179A\u178E\u17B6\u1798\u17BD\u1799 \u17A0\u17BE\u1799\u1781\u17D2\u1789\u17BB\u17C6\u1793\u17B9\u1784\u1794\u17C6\u1794\u17D2\u179B\u17C2\u1784\u1787\u17B6\u179F\u17C6\u17A1\u17C1\u1784\u178A\u17C4\u1799\u179F\u17D2\u179C\u17D0\u1799\u1794\u17D2\u179A\u179C\u178F\u17D2\u178F\u17B7\u17D4</i>
-
-\u{1F3A4} \u179F\u17C6\u17A1\u17C1\u1784: <b>${gender === "female" ? "\u{1F469} \u179F\u17D2\u179A\u17B8" : "\u{1F468} \u1794\u17D2\u179A\u17BB\u179F"}</b>  \u26A1 \u179B\u17D2\u1794\u17BF\u1793: <b>${SPEED_LABELS[speed]}</b>`,
+          text: "👋 សូមស្វាគមន៍មកកាន់ VoxCPM2 Bot",
     reply_markup: buildVoiceKeyboard(gender, speed)
   }, token);
 }
