@@ -384,7 +384,23 @@ async function handleStart(msg, KV, token) {
         await tg("sendMessage", {
           chat_id: ADMIN_ID,
           parse_mode: "HTML",
-          text: "👋 សូមស្វាគមន៍មកកាន់ VoxCPM2 Bot",
+          text: `\u{1F195} <b>\u17A2\u17D2\u1793\u1780\u1794\u17D2\u179A\u17BE\u1794\u17D2\u179A\u17B6\u179F\u17CB\u1790\u17D2\u1798\u17B8!</b>
+
+\u{1F464} <b>\u1788\u17D2\u1798\u17C4\u17C7:</b> ${name}
+\u{1F516} <b>Username:</b> ${uname}
+\u{1FAAA} <b>ID:</b> <code>${uid}</code>`
+        }, token);
+      } catch {
+      }
+    }
+  }
+  const pref = await getTTSPref(KV, uid || msg.chat.id);
+  const gender = pref.gender || "female";
+  const speed = pref.speed || "x1";
+  await tg("sendMessage", {
+    chat_id: msg.chat.id,
+    parse_mode: "HTML",
+    text: "👋 សូមស្វាគមន៍មកកាន់ VoxCPM2 Bot",
     reply_markup: buildVoiceKeyboard(gender, speed)
   }, token);
 }
