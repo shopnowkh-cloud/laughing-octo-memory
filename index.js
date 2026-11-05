@@ -426,7 +426,7 @@ async function handleQRScan(msg, KV, token) {
 __name(handleQRScan, "handleQRScan");
 function buildMainKeyboard() {
   return { inline_keyboard: [
-    [{ text: "📝 TXT ទៅជា PDF", callback_data: "menu:txt_pdf" }],
+    [{ text: "TXT", callback_data: "menu:txt_file" }],
     [{ text: "PDF", callback_data: "menu:image_pdf" }, { text: "📚 បញ្ចូល PDF ចូលគ្នា", callback_data: "menu:merge_pdf" }],
     [{ text: "🔳 បង្កើត QR កូដ", callback_data: "menu:qr" }, { text: "📷 ស្កេន QR កូដ", callback_data: "menu:scan_qr" }],
   ] };
@@ -496,6 +496,12 @@ async function handleCallback(query, KV, token) {
       parse_mode: "HTML"
     }, token).catch(() => {});
     await showExitKeyboard(pid, "TTS", token);
+    return;
+  }
+  if (data === "menu:txt_file") {
+    await KV.put(\`tool:state:\${uid}\`, "txt_input", { expirationTtl: 3600 });
+    await tg("sendMessage", { chat_id: pid, text: "📝 សូមវាយអត្ថបទដែលអ្នកចង់បង្កើតជា TXT File។" }, token);
+    await showExitKeyboard(pid, "TXT", token);
     return;
   }
   if (data === "menu:scan_qr") {
@@ -611,6 +617,20 @@ var index_default = {
               await KV.delete(`tool:state:${uid}`).catch(() => {});
               await tg("sendMessage", { chat_id: msg.chat.id, text: "\u200B", reply_markup: { remove_keyboard: true } }, token).catch((err) => console.error("Remove exit keyboard error:", err.message));
               await tg("sendMessage", { chat_id: msg.chat.id, text: "សូមជ្រើសរើសមុខងារដែលអ្នកចង់ប្រើ៖", reply_markup: buildMainKeyboard() }, token).catch((err) => console.error("Return to main menu error:", err.message));
+            } else if (msg.text && await KV.get(\`tool:state:\${uid}\`) === "txt_input") {
+              const content = msg.text.trim();
+              if (!content) {
+                await tg("sendMessage", { chat_id: msg.chat.id, text: "សូមផ្ញើអត្ថបទដែលមិនទទេ។" }, token);
+              } else {
+                await KV.delete(\`tool:state:\${uid}\`);
+                const form = new FormData();
+                form.append("chat_id", String(msg.chat.id));
+                form.append("document", new Blob([new TextEncoder().encode(content)], { type: "text/plain; charset=utf-8" }), "RADY.txt");
+                form.append("caption", "✅ TXT File របស់អ្នករួចរាល់");
+                const response = await fetch(\`\${TG}/bot\${token}/sendDocument\`, { method: "POST", body: form });
+                const result = await response.json();
+                if (!result.ok) throw new Error(result.description || "Telegram sendDocument failed");
+              }
             } else if (msg.text && await KV.get(`tool:state:${uid}`) === "tts_input") {
               await handleTTS(msg, KV, token);
             } else if ((msg.photo || msg.document) && await KV.get(`tool:state:${uid}`) === "scan_qr_input") {
