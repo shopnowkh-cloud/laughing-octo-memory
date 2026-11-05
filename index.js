@@ -371,6 +371,17 @@ async function handleTTS(msg, KV, token) {
   }
 }
 __name(handleTTS, "handleTTS");
+function buildMainKeyboard() {
+  return { inline_keyboard: [
+    [{ text: "📄 PDF to TXT", callback_data: "menu:pdf_txt" }, { text: "📝 TXT to PDF", callback_data: "menu:txt_pdf" }],
+    [{ text: "🖼️ Image to PDF", callback_data: "menu:image_pdf" }, { text: "📚 Merge PDF", callback_data: "menu:merge_pdf" }],
+    [{ text: "🔳 Create QR Code", callback_data: "menu:qr" }, { text: "📷 Scan QR Code", callback_data: "menu:scan_qr" }],
+    [{ text: "🎙️ Text to Voice", callback_data: "menu:tts" }],
+    [{ text: "🔗 Text to Link", callback_data: "menu:text_link" }, { text: "🎬 Video to Link", callback_data: "menu:video_link" }],
+    [{ text: "🖼️ Image to Link", callback_data: "menu:image_link" }, { text: "ℹ️ About", callback_data: "menu:about" }]
+  ] };
+}
+__name(buildMainKeyboard, "buildMainKeyboard");
 async function handleStart(msg, KV, token) {
   if (msg.chat.type !== "private") return;
   const uid = msg.from?.id;
@@ -394,14 +405,11 @@ async function handleStart(msg, KV, token) {
       }
     }
   }
-  const pref = await getTTSPref(KV, uid || msg.chat.id);
-  const gender = pref.gender || "female";
-  const speed = pref.speed || "x1";
   await tg("sendMessage", {
     chat_id: msg.chat.id,
     parse_mode: "HTML",
-    text: "👋 សូមស្វាគមន៍មកកាន់ VoxCPM2 Bot",
-    reply_markup: buildVoiceKeyboard(gender, speed)
+    text: "👋 <b>សូមស្វាគមន៍មកកាន់ RADY AI Multifunction Bot</b>\n\nសូមជ្រើសរើសមុខងារដែលអ្នកចង់ប្រើ៖",
+    reply_markup: buildMainKeyboard()
   }, token);
 }
 __name(handleStart, "handleStart");
@@ -412,6 +420,48 @@ async function handleCallback(query, KV, token) {
   const data = query.data;
   await tg("answerCallbackQuery", { callback_query_id: query.id }, token).catch(() => {
   });
+  if (data === "menu:home") {
+    await tg("editMessageText", {
+      chat_id: pid, message_id: msgId,
+      text: "👋 <b>RADY AI Multifunction Bot</b>\n\nសូមជ្រើសរើសមុខងារ៖",
+      parse_mode: "HTML", reply_markup: buildMainKeyboard()
+    }, token).catch(() => {});
+    return;
+  }
+  if (data === "menu:tts") {
+    const pref = await getTTSPref(KV, uid);
+    await tg("editMessageText", {
+      chat_id: pid, message_id: msgId,
+      text: "🎙️ <b>Text to Voice</b>\n\nផ្ញើអត្ថបទមកខ្ញុំ ដើម្បីបម្លែងជាសំឡេង។ អ្នកអាចកំណត់សំឡេង និងល្បឿនខាងក្រោម៖",
+      parse_mode: "HTML",
+      reply_markup: { inline_keyboard: [
+        ...buildVoiceKeyboard(pref.gender || "female", pref.speed || "x1").inline_keyboard,
+        [{ text: "⬅️ ត្រឡប់ទៅ Menu", callback_data: "menu:home" }]
+      ]}
+    }, token).catch(() => {});
+    return;
+  }
+  if (data === "menu:qr") {
+    await KV.put(`tool:state:${uid}`, "qr_input", { expirationTtl: 600 });
+    await tg("sendMessage", { chat_id: pid, text: "🔳 សូមផ្ញើអត្ថបទ ឬ URL ដែលអ្នកចង់បង្កើតជា QR Code។\n\nវាយ /cancel ដើម្បីបោះបង់។" }, token);
+    return;
+  }
+  if (data.startsWith("menu:")) {
+    const labels = {
+      "menu:pdf_txt":"📄 PDF to TXT", "menu:txt_pdf":"📝 TXT to PDF",
+      "menu:image_pdf":"🖼️ Image to PDF", "menu:merge_pdf":"📚 Merge PDF",
+      "menu:scan_qr":"📷 Scan QR Code", "menu:text_link":"🔗 Text to Link",
+      "menu:video_link":"🎬 Video to Link", "menu:image_link":"🖼️ Image to Link",
+      "menu:about":"ℹ️ About"
+    };
+    const label = labels[data];
+    if (label) await tg("answerCallbackQuery", {
+      callback_query_id: query.id,
+      text: data === "menu:about" ? "RADY AI Multifunction Bot — មុខងារកំពុងអភិវឌ្ឍ" : label + " — នឹងបន្ថែមនៅដំណាក់កាលទី 2",
+      show_alert: true
+    }, token).catch(() => {});
+    return;
+  }
   if (data.startsWith("voice:")) {
     const gender = data.slice(6);
     if (!["male", "female"].includes(gender)) return;
@@ -491,8 +541,34 @@ var index_default = {
         } else if (update.message) {
           const msg = update.message;
           if (msg.chat?.type === "private") {
-            if (msg.text?.startsWith("/start")) await handleStart(msg, KV, token);
-            else if (msg.text) await handleTTS(msg, KV, token);
+            const uid = msg.from?.id || msg.chat.id;
+            if (msg.text?.startsWith("/start")) {
+              await KV.delete(`tool:state:${uid}`);
+              await handleStart(msg, KV, token);
+            } else if (msg.text?.startsWith("/cancel")) {
+              await KV.delete(`tool:state:${uid}`);
+              await tg("sendMessage", { chat_id: msg.chat.id, text: "បានបោះបង់។ សូមជ្រើសរើសមុខងារពី Menu។", reply_markup: buildMainKeyboard() }, token);
+            } else if (msg.text && await KV.get(`tool:state:${uid}`) === "qr_input") {
+              await KV.delete(`tool:state:${uid}`);
+              const value = msg.text.trim();
+              if (!value) {
+                await tg("sendMessage", { chat_id: msg.chat.id, text: "សូមផ្ញើអត្ថបទ ឬ URL ដែលត្រឹមត្រូវ។" }, token);
+              } else {
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=800x800&data=${encodeURIComponent(value)}`;
+                const sent = await fetch(qrUrl);
+                if (!sent.ok) throw new Error("QR service unavailable");
+                const image = await sent.arrayBuffer();
+                const form = new FormData();
+                form.append("chat_id", String(msg.chat.id));
+                form.append("photo", new Blob([image], { type: "image/png" }), "rady-qr.png");
+                form.append("caption", "✅ QR Code របស់អ្នករួចរាល់");
+                const response = await fetch(`${TG}/bot${token}/sendPhoto`, { method: "POST", body: form });
+                const result = await response.json();
+                if (!result.ok) throw new Error(result.description || "Telegram sendPhoto failed");
+              }
+            } else if (msg.text) {
+              await handleTTS(msg, KV, token);
+            }
           }
         }
       } catch (err) {
