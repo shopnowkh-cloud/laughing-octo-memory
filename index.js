@@ -427,7 +427,7 @@ __name(handleQRScan, "handleQRScan");
 function buildMainKeyboard() {
   return { inline_keyboard: [
     [{ text: "📝 TXT ទៅជា PDF", callback_data: "menu:txt_pdf" }],
-    [{ text: "🖼️ រូបភាព ទៅជា PDF", callback_data: "menu:image_pdf" }, { text: "📚 បញ្ចូល PDF ចូលគ្នា", callback_data: "menu:merge_pdf" }],
+    [{ text: "PDF", callback_data: "menu:image_pdf" }, { text: "📚 បញ្ចូល PDF ចូលគ្នា", callback_data: "menu:merge_pdf" }],
     [{ text: "🔳 បង្កើត QR កូដ", callback_data: "menu:qr" }, { text: "📷 ស្កេន QR កូដ", callback_data: "menu:scan_qr" }],
   ] };
 }
