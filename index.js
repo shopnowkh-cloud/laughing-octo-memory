@@ -386,7 +386,6 @@ function buildMainKeyboard() {
     [{ text: "🔳 បង្កើត QR កូដ", callback_data: "menu:qr" }, { text: "📷 ស្កេន QR កូដ", callback_data: "menu:scan_qr" }],
     [{ text: "🎙️ បម្លែងអត្ថបទជាសំឡេង", callback_data: "menu:tts" }],
     [{ text: "🔗 អត្ថបទទៅជាតំណ", callback_data: "menu:text_link" }, { text: "🎬 វីដេអូទៅជាតំណ", callback_data: "menu:video_link" }],
-    [{ text: "🖼️ រូបភាពទៅជាតំណ", callback_data: "menu:image_link" }]
   ] };
 }
 __name(buildMainKeyboard, "buildMainKeyboard");
@@ -472,7 +471,7 @@ async function handleCallback(query, KV, token) {
       "menu:txt_pdf":"📝 TXT ទៅជា PDF",
       "menu:image_pdf":"🖼️ រូបភាព ទៅជា PDF", "menu:merge_pdf":"📚 បញ្ចូល PDF ចូលគ្នា",
       "menu:scan_qr":"📷 ស្កេន QR កូដ", "menu:text_link":"🔗 អត្ថបទទៅជាតំណ",
-      "menu:video_link":"🎬 វីដេអូទៅជាតំណ", "menu:image_link":"🖼️ រូបភាពទៅជាតំណ",
+      "menu:video_link":"🎬 វីដេអូទៅជាតំណ",
     };
     const label = labels[data];
     if (label) await tg("sendMessage", {
