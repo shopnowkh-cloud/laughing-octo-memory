@@ -455,10 +455,10 @@ async function handleCallback(query, KV, token) {
       "menu:about":"ℹ️ About"
     };
     const label = labels[data];
-    if (label) await tg("answerCallbackQuery", {
-      callback_query_id: query.id,
-      text: data === "menu:about" ? "RADY AI Multifunction Bot — មុខងារកំពុងអភិវឌ្ឍ" : label + " — នឹងបន្ថែមនៅដំណាក់កាលទី 2",
-      show_alert: true
+    if (label) await tg("sendMessage", {
+      chat_id: pid,
+      text: data === "menu:about" ? "ℹ️ RADY AI Multifunction Bot\nមុខងារបន្ថែមកំពុងអភិវឌ្ឍ។" : label + "\nមុខងារនេះនឹងបន្ថែមនៅដំណាក់កាលទី 2។",
+      reply_markup: { inline_keyboard: [[{ text: "⬅️ ត្រឡប់ទៅ Menu", callback_data: "menu:home" }]] }
     }, token).catch(() => {});
     return;
   }
