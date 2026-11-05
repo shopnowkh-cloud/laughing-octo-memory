@@ -429,7 +429,6 @@ function buildMainKeyboard() {
     [{ text: "📝 TXT ទៅជា PDF", callback_data: "menu:txt_pdf" }],
     [{ text: "🖼️ រូបភាព ទៅជា PDF", callback_data: "menu:image_pdf" }, { text: "📚 បញ្ចូល PDF ចូលគ្នា", callback_data: "menu:merge_pdf" }],
     [{ text: "🔳 បង្កើត QR កូដ", callback_data: "menu:qr" }, { text: "📷 ស្កេន QR កូដ", callback_data: "menu:scan_qr" }],
-    [{ text: "🎬 វីដេអូទៅជាតំណ", callback_data: "menu:video_link" }],
   ] };
 }
 __name(buildMainKeyboard, "buildMainKeyboard");
@@ -520,7 +519,6 @@ async function handleCallback(query, KV, token) {
     const labels = {
       "menu:txt_pdf":"📝 TXT ទៅជា PDF",
       "menu:image_pdf":"🖼️ រូបភាព ទៅជា PDF", "menu:merge_pdf":"📚 បញ្ចូល PDF ចូលគ្នា",
-      "menu:video_link":"🎬 វីដេអូទៅជាតំណ",
     };
     const label = labels[data];
     if (label) await tg("sendMessage", {
