@@ -612,10 +612,10 @@ var index_default = {
             if (msg.text?.startsWith("/start")) {
               await KV.delete(`tool:state:${uid}`);
               await handleStart(msg, KV, token);
-            } else if (msg.text?.startsWith("ចេញពីមុខងារ:")) {
-              await KV.delete(`tool:state:${uid}`);
-              await tg("sendMessage", { chat_id: msg.chat.id, text: "\u200B", reply_markup: { remove_keyboard: true } }, token);
-              await tg("sendMessage", { chat_id: msg.chat.id, text: "សូមជ្រើសរើសមុខងារដែលអ្នកចង់ប្រើ៖", reply_markup: buildMainKeyboard() }, token);
+            } else if (msg.text?.trim().startsWith("ចេញពីមុខងារ")) {
+              await KV.delete(`tool:state:${uid}`).catch(() => {});
+              await tg("sendMessage", { chat_id: msg.chat.id, text: "\u200B", reply_markup: { remove_keyboard: true } }, token).catch((err) => console.error("Remove exit keyboard error:", err.message));
+              await tg("sendMessage", { chat_id: msg.chat.id, text: "សូមជ្រើសរើសមុខងារដែលអ្នកចង់ប្រើ៖", reply_markup: buildMainKeyboard() }, token).catch((err) => console.error("Return to main menu error:", err.message));
             } else if (msg.text && await KV.get(`tool:state:${uid}`) === "tts_input") {
               await handleTTS(msg, KV, token);
             } else if ((msg.photo || msg.document) && await KV.get(`tool:state:${uid}`) === "scan_qr_input") {
