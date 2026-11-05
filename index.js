@@ -509,7 +509,7 @@ var index_default = {
     if (method === "GET" && url.pathname === "/setup") {
       const workerUrl = `${url.protocol}//${url.host}/webhook`;
       try {
-        await tg("deleteWebhook", { drop_pending_updates: true }, env.BOT_TOKEN);
+        await tg("deleteWebhook", { drop_pending_updates: true }, (env.BOT_TOKEN || env.TELEGRAM_BOT_TOKEN));
         const result = await tg("setWebhook", {
           url: workerUrl,
           allowed_updates: ["message", "callback_query", "inline_query"]
