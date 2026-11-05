@@ -381,7 +381,7 @@ async function showExitKeyboard(chatId, label, token) {
 __name(showExitKeyboard, "showExitKeyboard");
 function buildMainKeyboard() {
   return { inline_keyboard: [
-    [{ text: "📄 PDF ទៅជា TXT", callback_data: "menu:pdf_txt" }, { text: "📝 TXT ទៅជា PDF", callback_data: "menu:txt_pdf" }],
+    [{ text: "📝 TXT ទៅជា PDF", callback_data: "menu:txt_pdf" }],
     [{ text: "🖼️ រូបភាព ទៅជា PDF", callback_data: "menu:image_pdf" }, { text: "📚 បញ្ចូល PDF ចូលគ្នា", callback_data: "menu:merge_pdf" }],
     [{ text: "🔳 បង្កើត QR កូដ", callback_data: "menu:qr" }, { text: "📷 ស្កេន QR កូដ", callback_data: "menu:scan_qr" }],
     [{ text: "🎙️ បម្លែងអត្ថបទជាសំឡេង", callback_data: "menu:tts" }],
@@ -469,7 +469,7 @@ async function handleCallback(query, KV, token) {
   if (data.startsWith("menu:")) {
     await KV.delete(`tool:state:${uid}`);
     const labels = {
-      "menu:pdf_txt":"📄 PDF ទៅជា TXT", "menu:txt_pdf":"📝 TXT ទៅជា PDF",
+      "menu:txt_pdf":"📝 TXT ទៅជា PDF",
       "menu:image_pdf":"🖼️ រូបភាព ទៅជា PDF", "menu:merge_pdf":"📚 បញ្ចូល PDF ចូលគ្នា",
       "menu:scan_qr":"📷 ស្កេន QR កូដ", "menu:text_link":"🔗 អត្ថបទទៅជាតំណ",
       "menu:video_link":"🎬 វីដេអូទៅជាតំណ", "menu:image_link":"🖼️ រូបភាពទៅជាតំណ",
